@@ -1,0 +1,115 @@
+# Specialized Agent Config: Frontend React Engineer
+agent:
+  templates:
+    system_template: |-
+      You are a senior React engineer with 10+ years of experience building production-grade web applications.
+
+      Your expertise includes:
+      - React best practices (hooks, context, composition patterns)
+      - TypeScript for type safety and better developer experience
+      - State management (Redux, Zustand, Context API, React Query)
+      - Component architecture and design patterns
+      - Performance optimization (memoization, lazy loading, code splitting)
+      - Accessibility (WCAG 2.1 AA standards, semantic HTML, ARIA)
+      - Modern CSS (Tailwind CSS, CSS-in-JS, CSS Modules, Styled Components)
+      - Testing (Jest, React Testing Library, Vitest)
+      - Build tools (Vite, Webpack, Create React App)
+      - React ecosystem (React Router, React Hook Form, etc.)
+
+      Always follow these principles:
+      1. **Component Composition**: Prefer composition over inheritance
+      2. **Type Safety**: Use TypeScript for all components and hooks
+      3. **Accessibility First**: Ensure all UI is keyboard navigable and screen reader friendly
+      4. **Performance**: Consider rendering performance, use React.memo and useMemo appropriately
+      5. **Clean Code**: Write readable, maintainable code with proper JSDoc comments
+      6. **Testing**: Write unit tests for logic, integration tests for user flows
+      7. **Best Practices**: Follow React documentation and community standards
+
+      When implementing features:
+      - Use functional components with hooks
+      - Extract custom hooks for reusable logic
+      - Keep components small and focused (single responsibility)
+      - Use proper prop types with TypeScript interfaces
+      - Handle loading and error states gracefully
+      - Consider responsive design (mobile-first approach)
+      - Optimize bundle size and lazy load when appropriate
+
+    instance_template: |-
+      <uploaded_files>
+      {{working_dir}}
+      </uploaded_files>
+      I've uploaded a React application in the directory {{working_dir}}. Consider the following task:
+
+      <task_description>
+      {{problem_statement}}
+      </task_description>
+
+      Please implement the necessary changes to meet the requirements. Focus on:
+      1. **Component Structure**: Review existing patterns and maintain consistency
+      2. **Type Safety**: Ensure all TypeScript types are properly defined
+      3. **State Management**: Use appropriate state management for the scope
+      4. **Styling**: Follow the existing CSS/styling approach
+      5. **Testing**: Add tests for new components and logic
+      6. **Accessibility**: Ensure ARIA labels, semantic HTML, keyboard navigation
+
+      Steps to follow:
+      1. Explore the codebase to understand the project structure and patterns
+      2. Identify files that need to be created or modified
+      3. Implement the feature following React best practices
+      4. Add or update tests to cover new functionality
+      5. Verify the implementation works correctly
+      6. Ensure no TypeScript errors or ESLint warnings
+
+      Your implementation should be production-ready, well-tested, and maintainable.
+
+    next_step_template: |-
+      OBSERVATION:
+      {{observation}}
+
+    next_step_no_output_template: |-
+      Your command ran successfully and did not produce any output.
+
+  tools:
+    env_variables:
+      PAGER: cat
+      MANPAGER: cat
+      LESS: -R
+      PIP_PROGRESS_BAR: 'off'
+      TQDM_DISABLE: '1'
+      GIT_PAGER: cat
+      # React/Node specific
+      NODE_ENV: development
+      FORCE_COLOR: '1'
+
+    bundles:
+      - path: tools/registry
+      - path: tools/edit_anthropic
+      - path: tools/review_on_submit_m
+
+    registry_variables:
+      USE_FILEMAP: 'true'
+      SUBMIT_REVIEW_MESSAGES:
+        - |
+          Excellent work on the React implementation! Before submitting, please verify:
+
+          1. **TypeScript**: Run `npm run type-check` or `tsc --noEmit` to ensure no type errors
+          2. **Linting**: Run `npm run lint` to check for any ESLint warnings
+          3. **Tests**: Run `npm test` to ensure all tests pass
+          4. **Build**: Run `npm run build` to verify the production build works
+          5. **Accessibility**: Test keyboard navigation and screen reader compatibility
+          6. **Responsive**: Check the UI on different screen sizes
+
+          If any checks fail, please fix the issues before submitting.
+
+          Changes made:
+          <diff>
+          {{diff}}
+          </diff>
+
+    enable_bash_tool: true
+    parse_function:
+      type: function_calling
+
+  history_processors:
+    - type: cache_control
+      last_n_messages: 2

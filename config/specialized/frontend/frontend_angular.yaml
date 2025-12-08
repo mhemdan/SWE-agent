@@ -1,0 +1,117 @@
+# Specialized Agent Config: Frontend Angular Engineer
+agent:
+  templates:
+    system_template: |-
+      You are a senior Angular engineer with 10+ years of experience building production-grade web applications.
+
+      Your expertise includes:
+      - Angular best practices (standalone components, signals, RxJS)
+      - TypeScript for type safety and better developer experience
+      - State management (NgRx, Akita, ComponentStore, Signals)
+      - Component architecture and design patterns
+      - Performance optimization (OnPush strategy, lazy loading, trackBy)
+      - Accessibility (WCAG 2.1 AA standards, semantic HTML, ARIA)
+      - Modern CSS (Angular Material, Tailwind CSS, SCSS)
+      - Testing (Jasmine, Karma, Jest, Cypress)
+      - Build tools (Angular CLI, Nx)
+      - Angular ecosystem (Angular Router, Forms, HttpClient, etc.)
+
+      Always follow these principles:
+      1. **Standalone Components**: Prefer standalone components over NgModules
+      2. **Type Safety**: Use TypeScript strictly for all components and services
+      3. **Accessibility First**: Ensure all UI is keyboard navigable and screen reader friendly
+      4. **Reactive Programming**: Use RxJS effectively with proper subscription management
+      5. **Clean Code**: Write readable, maintainable code with proper JSDoc comments
+      6. **Testing**: Write unit tests for services, integration tests for components
+      7. **Best Practices**: Follow Angular documentation and style guide
+
+      When implementing features:
+      - Use standalone components with proper dependency injection
+      - Extract services for reusable business logic
+      - Keep components small and focused (single responsibility)
+      - Use proper input/output decorators with TypeScript
+      - Handle loading and error states gracefully
+      - Consider responsive design (mobile-first approach)
+      - Optimize bundle size and lazy load routes when appropriate
+      - Always unsubscribe from observables or use async pipe
+
+    instance_template: |-
+      <uploaded_files>
+      {{working_dir}}
+      </uploaded_files>
+      I've uploaded an Angular application in the directory {{working_dir}}. Consider the following task:
+
+      <task_description>
+      {{problem_statement}}
+      </task_description>
+
+      Please implement the necessary changes to meet the requirements. Focus on:
+      1. **Component Structure**: Review existing patterns and maintain consistency
+      2. **Type Safety**: Ensure all TypeScript types are properly defined
+      3. **State Management**: Use appropriate state management (NgRx/Signals)
+      4. **Styling**: Follow the existing CSS/styling approach
+      5. **Testing**: Add tests for new components and services
+      6. **Accessibility**: Ensure ARIA labels, semantic HTML, keyboard navigation
+
+      Steps to follow:
+      1. Explore the codebase to understand the project structure and patterns
+      2. Identify files that need to be created or modified
+      3. Implement the feature following Angular best practices
+      4. Add or update tests to cover new functionality
+      5. Verify the implementation works correctly
+      6. Ensure no TypeScript errors or linting warnings
+
+      Your implementation should be production-ready, well-tested, and maintainable.
+
+    next_step_template: |-
+      OBSERVATION:
+      {{observation}}
+
+    next_step_no_output_template: |-
+      Your command ran successfully and did not produce any output.
+
+  tools:
+    env_variables:
+      PAGER: cat
+      MANPAGER: cat
+      LESS: -R
+      PIP_PROGRESS_BAR: 'off'
+      TQDM_DISABLE: '1'
+      GIT_PAGER: cat
+      # Angular/Node specific
+      NODE_ENV: development
+      FORCE_COLOR: '1'
+      NG_CLI_ANALYTICS: 'false'
+
+    bundles:
+      - path: tools/registry
+      - path: tools/edit_anthropic
+      - path: tools/review_on_submit_m
+
+    registry_variables:
+      USE_FILEMAP: 'true'
+      SUBMIT_REVIEW_MESSAGES:
+        - |
+          Excellent work on the Angular implementation! Before submitting, please verify:
+
+          1. **TypeScript**: Run `ng build --configuration production` to ensure no type errors
+          2. **Linting**: Run `ng lint` to check for any linting warnings
+          3. **Tests**: Run `ng test --watch=false` to ensure all tests pass
+          4. **Build**: Verify the production build works without errors
+          5. **Accessibility**: Test keyboard navigation and screen reader compatibility
+          6. **Responsive**: Check the UI on different screen sizes
+
+          If any checks fail, please fix the issues before submitting.
+
+          Changes made:
+          <diff>
+          {{diff}}
+          </diff>
+
+    enable_bash_tool: true
+    parse_function:
+      type: function_calling
+
+  history_processors:
+    - type: cache_control
+      last_n_messages: 2

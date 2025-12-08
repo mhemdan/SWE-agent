@@ -28,6 +28,7 @@ Here's an example that uses [bold][cyan]modal[/bold][/cyan] instead of docker an
 """
 
 import getpass
+import os
 import sys
 from pathlib import Path
 from typing import Self
@@ -167,6 +168,11 @@ class RunSingle:
         config.set_default_output_dir()
         config.output_dir.mkdir(parents=True, exist_ok=True)
         agent = get_agent_from_config(config.agent)
+        activity_path = os.environ.get("SWE_AGENT_ACTIVITY_STREAM_PATH")
+        if activity_path:
+            from sweagent.agent.hooks.activity_stream import ActivityStreamAgentHook
+
+            agent.add_hook(ActivityStreamAgentHook(Path(activity_path)))
         agent.replay_config = config  # type: ignore[attr-defined]
         self = cls(
             env=SWEEnv.from_config(config.env),
