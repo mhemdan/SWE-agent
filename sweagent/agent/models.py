@@ -705,9 +705,9 @@ class LiteLLMModel(AbstractModel):
         if self.config.api_base:
             # Not assigned a default value in litellm, so only pass this if it's set
             extra_args["api_base"] = self.config.api_base
-        custom_provider = os.getenv("LLM_PROVIDER") or os.getenv("OPENAI_PROVIDER")
+        custom_provider = (os.getenv("LLM_PROVIDER") or os.getenv("OPENAI_PROVIDER") or "").lower()
         if custom_provider and "custom_llm_provider" not in self.config.completion_kwargs:
-            extra_args["custom_llm_provider"] = custom_provider.lower()
+            extra_args["custom_llm_provider"] = custom_provider
         if self.tools.use_function_calling:
             extra_args["tools"] = self.tools.tools
         # We need to always set max_tokens for anthropic models
@@ -740,7 +740,8 @@ class LiteLLMModel(AbstractModel):
             cost = litellm.cost_calculator.completion_cost(response, model=self.config.name)
         except Exception as e:
             self.logger.debug(f"Error calculating cost: {e}, setting cost to 0.")
-            if self.config.per_instance_cost_limit > 0 or self.config.total_cost_limit > 0:
+            allow_unknown_cost = bool(custom_provider or self.config.api_base)
+            if (self.config.per_instance_cost_limit > 0 or self.config.total_cost_limit > 0) and not allow_unknown_cost:
                 msg = (
                     f"Error calculating cost: {e} for your model {self.config.name}. If this is ok "
                     "(local models, etc.), please make sure you set `per_instance_cost_limit` and "
