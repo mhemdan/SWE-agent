@@ -705,6 +705,9 @@ class LiteLLMModel(AbstractModel):
         if self.config.api_base:
             # Not assigned a default value in litellm, so only pass this if it's set
             extra_args["api_base"] = self.config.api_base
+        custom_provider = os.getenv("LLM_PROVIDER") or os.getenv("OPENAI_PROVIDER")
+        if custom_provider and "custom_llm_provider" not in self.config.completion_kwargs:
+            extra_args["custom_llm_provider"] = custom_provider.lower()
         if self.tools.use_function_calling:
             extra_args["tools"] = self.tools.tools
         # We need to always set max_tokens for anthropic models
