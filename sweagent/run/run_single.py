@@ -173,6 +173,14 @@ class RunSingle:
             from sweagent.agent.hooks.activity_stream import ActivityStreamAgentHook
 
             agent.add_hook(ActivityStreamAgentHook(Path(activity_path)))
+
+        # Add completion detector hook if enabled (helps prevent infinite loops)
+        completion_detector_enabled = os.environ.get("SWE_AGENT_COMPLETION_DETECTOR", "true").lower() in ("1", "true", "yes")
+        if completion_detector_enabled:
+            from sweagent.agent.hooks.completion_detector import CompletionDetectorHook
+
+            agent.add_hook(CompletionDetectorHook())
+
         agent.replay_config = config  # type: ignore[attr-defined]
         self = cls(
             env=SWEEnv.from_config(config.env),
