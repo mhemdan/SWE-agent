@@ -190,7 +190,10 @@ class ThoughtActionParser(AbstractParseFunction, BaseModel):
                 if completion_note:
                     note = f"Auto-submitting with reported status '{parsed_payload['status']}': {completion_note}"
                     thought = thought.rstrip("\n")
-                    thought = f"{thought}{note if not thought else '\n' + note}"
+                    if thought:
+                        thought = f"{thought}\n{note}"
+                    else:
+                        thought = note
                 return thought, "submit"
 
             return thought, action
