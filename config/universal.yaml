@@ -24,7 +24,10 @@ agent:
       4. Edit the source code to implement the required changes
       5. Test your changes to confirm they work correctly
       6. Think about edge cases and make sure your implementation handles them well
+      7. When you are completely done with all changes and have verified they work, you MUST call the `submit` command to finalize your work
       Your thinking should be thorough and so it's fine if it's very long.
+
+      IMPORTANT: You MUST call the `submit` command when you have finished making all changes. This is required to save your work and create a pull request.
     next_step_template: |-
       OBSERVATION:
       {{observation}}
