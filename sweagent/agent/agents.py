@@ -57,6 +57,13 @@ from sweagent.utils.log import get_logger
 from sweagent.utils.patch_formatter import PatchFormatter
 
 
+NOOP_COMPLETION_PHRASES = (
+    "no further commands to execute",
+    "no more commands to execute",
+    "interaction is complete",
+)
+
+
 class TemplateConfig(BaseModel):
     """This configuration is used to define almost all message templates that are
     formatted by the agent and sent to the LM.
@@ -959,6 +966,14 @@ class DefaultAgent(AbstractAgent):
         self._chook.on_action_started(step=step)
         execution_t0 = time.perf_counter()
         run_action: str = self.tools.guard_multiline_input(step.action).strip()
+        if self._model_signaled_completion(run_action):
+            self.logger.info("Model indicated completion without running a shell command; exiting")
+            step.done = True
+            if not step.exit_status:
+                step.exit_status = "completed"
+            step.observation = "Model indicated completion without running a command."
+            step.state = self.tools.get_state(env=self._env)
+            return step
         try:
             step.observation = self._env.communicate(
                 input=run_action,
@@ -1002,6 +1017,18 @@ class DefaultAgent(AbstractAgent):
             raise _ExitForfeit()
 
         return self.handle_submission(step)
+
+    @staticmethod
+    def _model_signaled_completion(action: str) -> bool:
+        if not action:
+            return False
+        stripped = action.lstrip()
+        if not stripped.startswith("#"):
+            return False
+        normalized = stripped.lstrip("#").strip().lower()
+        if not normalized:
+            return False
+        return any(phrase in normalized for phrase in NOOP_COMPLETION_PHRASES)
 
     def forward(self, history: list[dict[str, str]]) -> StepOutput:
         """Forward the model without handling errors.
