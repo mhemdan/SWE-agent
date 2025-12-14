@@ -35,6 +35,20 @@ def test_thought_action_parser():
     with pytest.raises(FormatError):
         parser({"message": "No code block"}, [])
 
+    completion_response = (
+        "Implementation done.\n```json\n{\"status\": \"success\", \"message\": \"Ship it\"}\n```"
+    )
+    thought, action = parser({"message": completion_response}, [])
+    assert action == "submit"
+    assert "Auto-submitting" in thought
+    assert "Ship it" in thought
+
+    non_completion_response = (
+        "Implementation done.\n```json\n{\"status\": \"failed\", \"message\": \"Need help\"}\n```"
+    )
+    thought, action = parser({"message": non_completion_response}, [])
+    assert action.strip().startswith("{\"status\": \"failed\"")
+
 
 def test_xml_thought_action_parser():
     parser = XMLThoughtActionParser()

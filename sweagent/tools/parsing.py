@@ -49,6 +49,17 @@ from sweagent.tools.commands import Command
 from sweagent.tools.utils import _should_quote
 
 
+COMPLETION_SUBMIT_STATUSES = {
+    "success",
+    "succeeded",
+    "done",
+    "complete",
+    "completed",
+    "finished",
+    "resolved",
+}
+
+
 class AbstractParseFunction(ABC):
     """
     Abstract class for parsing functions.
@@ -160,7 +171,29 @@ class ThoughtActionParser(AbstractParseFunction, BaseModel):
         if last_valid_block:
             start, end = last_valid_block
             thought = model_response["message"][: start.start()] + model_response["message"][end.end() :]
-            return thought, model_response["message"][start.end() : end.start()]
+            action = model_response["message"][start.end() : end.start()]
+
+            # Detect completion payloads that the LM sometimes emits instead of commands
+            submit_payload = action.strip()
+            parsed_payload = None
+            if submit_payload:
+                try:
+                    parsed_payload = json.loads(submit_payload)
+                except json.JSONDecodeError:
+                    parsed_payload = None
+            if (
+                isinstance(parsed_payload, dict)
+                and parsed_payload.get("status", "").lower() in COMPLETION_SUBMIT_STATUSES
+                and isinstance(parsed_payload.get("message"), str)
+            ):
+                completion_note = parsed_payload["message"].strip()
+                if completion_note:
+                    note = f"Auto-submitting with reported status '{parsed_payload['status']}': {completion_note}"
+                    thought = thought.rstrip("\n")
+                    thought = f"{thought}{note if not thought else '\n' + note}"
+                return thought, "submit"
+
+            return thought, action
         msg = "No action found in model response."
         raise FormatError(msg)
 
