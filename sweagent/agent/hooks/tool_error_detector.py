@@ -62,11 +62,15 @@ class ToolErrorDetectorHook(AbstractAgentHook):
         self._last_error = None
         self._intervention_count = 0
 
-    def on_step_done(self, *, step: StepOutput):
+    def on_step_done(self, *, step: StepOutput, info=None):
         """
         Analyze step results and detect error patterns.
 
         Called after each step completes with observation.
+
+        Args:
+            step: The completed step output
+            info: Additional agent info (optional, not used)
         """
         if not self.enabled:
             return
