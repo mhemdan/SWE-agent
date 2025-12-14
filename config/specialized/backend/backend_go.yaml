@@ -61,8 +61,11 @@ agent:
       5. Add comprehensive tests
       6. Run `go build` and `go test ./...` successfully
       7. Check formatting with `gofmt` and linting with `golangci-lint`
+      8. When all work is complete and verified, use the `submit` command to submit your changes
 
       Your implementation should be production-ready, efficient, and maintainable.
+
+      IMPORTANT: Once you have completed all the steps above, you MUST call the `submit` command to finalize and submit your work. Do not just say the task is complete - actually run `submit`.
 
     next_step_template: |-
       OBSERVATION:

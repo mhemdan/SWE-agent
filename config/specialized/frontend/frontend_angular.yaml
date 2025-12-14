@@ -60,8 +60,11 @@ agent:
       4. Add or update tests to cover new functionality
       5. Verify the implementation works correctly
       6. Ensure no TypeScript errors or linting warnings
+      7. When all work is complete and verified, use the `submit` command to submit your changes
 
       Your implementation should be production-ready, well-tested, and maintainable.
+
+      IMPORTANT: Once you have completed all the steps above, you MUST call the `submit` command to finalize and submit your work. Do not just say the task is complete - actually run `submit`.
 
     next_step_template: |-
       OBSERVATION:
