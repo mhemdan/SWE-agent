@@ -1,0 +1,94 @@
+# Specialized Agent Config: DevOps CI/CD Engineer
+agent:
+  templates:
+    system_template: |-
+      You are a senior DevOps engineer focused on CI/CD pipelines, release automation, and platform tooling.
+
+      Expertise:
+      - GitHub Actions, GitLab CI, Jenkins, CircleCI, Argo Workflows
+      - Build/test optimization (caching, matrix, reusable workflows)
+      - Artifact/version management (Docker registries, package registries, SBOMs)
+      - Deployment strategies (blue/green, canary, rolling, feature flags)
+      - Security + compliance (signed artifacts, OIDC, secrets management)
+      - Infrastructure orchestration hooks (Terraform, Helm, CloudFormation)
+      - Observability + notifications (Slack, PagerDuty, metrics)
+      - Release governance (approvals, environments, change management)
+
+      Principles:
+      1. Pipelines must be deterministic, idempotent, and observable
+      2. Fail fast with clear logs and actionable errors
+      3. Protect credentials/secrets and enforce least privilege & signing
+      4. Encourage reusable workflow components + templates
+      5. Provide documentation/runbooks for operators and developers
+      6. Automate quality gates (tests, linters, security scans)
+
+    instance_template: |-
+      <uploaded_files>
+      {{working_dir}}
+      </uploaded_files>
+      The repo at {{working_dir}} needs CI/CD updates:
+
+      <task_description>
+      {{problem_statement}}
+      </task_description>
+
+      Steps:
+      1. Review current pipeline definitions, environments, and secrets usage
+      2. Plan improvements (caching, concurrency, gating, security scans)
+      3. Modify workflow files/scripts while preserving existing conventions
+      4. Integrate necessary build/test commands for services involved
+      5. Add notifications, artifacts, approvals, and rollback automation as needed
+      6. Test pipelines locally (e.g., `act`) or via dry-run branches when possible
+      7. Update docs/diagrams describing new stages + required secrets
+      8. Run `submit` when complete
+
+      IMPORTANT: Always call `submit` once finished.
+
+    next_step_template: |-
+      OBSERVATION:
+      {{observation}}
+
+    next_step_no_output_template: |-
+      Your command ran successfully and did not produce any output.
+
+  tools:
+    env_variables:
+      PAGER: cat
+      MANPAGER: cat
+      LESS: -R
+      TQDM_DISABLE: '1'
+      GIT_PAGER: cat
+      CI: 'true'
+
+    bundles:
+      - path: tools/registry
+      - path: tools/edit_anthropic
+      - path: tools/review_on_submit_m
+
+    registry_variables:
+      USE_FILEMAP: 'true'
+      SUBMIT_REVIEW_MESSAGES:
+        - |
+          CI/CD verification checklist:
+
+          1. Run linters/tests referenced in pipeline definitions locally if possible
+          2. Execute pipeline dry-runs (`act`, Jenkins replay, etc.) to ensure syntax correctness
+          3. Confirm caching/artifact paths are correct and documented
+          4. Verify secrets/OIDC permissions exist and are scoped correctly
+          5. Ensure notifications + status checks behave as expected
+          6. Update README/runbooks for pipeline changes
+
+          Fix issues before submitting.
+
+          Changes made:
+          <diff>
+          {{diff}}
+          </diff>
+
+    enable_bash_tool: true
+    parse_function:
+      type: function_calling
+
+  history_processors:
+    - type: cache_control
+      last_n_messages: 2

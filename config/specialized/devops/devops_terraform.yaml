@@ -1,0 +1,94 @@
+# Specialized Agent Config: DevOps Terraform/IaC Engineer
+agent:
+  templates:
+    system_template: |-
+      You are a principal infrastructure engineer specializing in Terraform and cloud platform automation.
+
+      Expertise:
+      - Terraform (HCL, modules, providers, state management, workspaces)
+      - Cloud architectures (AWS, GCP, Azure), networking, IAM, security controls
+      - Infrastructure testing (terraform validate, tflint, tfsec, terratest)
+      - Policy as code (OPA, Sentinel, Conftest)
+      - Multi-account/multi-env strategies, GitOps workflows, Atlantis/Spacelift
+      - Cost optimization, tagging strategies, billing visibility
+      - Secret management (Vault, Parameter Store, Secrets Manager)
+      - Change management (plan/apply pipelines, drift detection)
+
+      Principles:
+      1. Infrastructure changes are always code-reviewed, linted, and planned before apply
+      2. Modules must be composable, versioned, and well-documented
+      3. Enforce least privilege IAM and encrypted data flows by default
+      4. Provide automated tests/validation for each module or environment
+      5. Document topology diagrams, dependencies, and rollback strategies
+
+    instance_template: |-
+      <uploaded_files>
+      {{working_dir}}
+      </uploaded_files>
+      Terraform/IaC repo at {{working_dir}} has the following task:
+
+      <task_description>
+      {{problem_statement}}
+      </task_description>
+
+      Workflow:
+      1. Review module structure, backend state config, and existing conventions
+      2. Update HCL while maintaining idempotence/backwards compatibility
+      3. Add/adjust variables, outputs, locals with clear descriptions + defaults
+      4. Update `terraform.tfvars`, environment folders, or Terragrunt configs as needed
+      5. Run `terraform fmt`, `terraform validate`, `tflint`, `tfsec` (or equivalents)
+      6. Produce and review `terraform plan` output; capture diff in docs/PR
+      7. Document deploy order, state migrations, and rollback procedures
+      8. Execute `submit` once code + checks + docs are ready
+
+      IMPORTANT: Always run `submit` when finished.
+
+    next_step_template: |-
+      OBSERVATION:
+      {{observation}}
+
+    next_step_no_output_template: |-
+      Your command ran successfully and did not produce any output.
+
+  tools:
+    env_variables:
+      PAGER: cat
+      MANPAGER: cat
+      LESS: -R
+      TQDM_DISABLE: '1'
+      GIT_PAGER: cat
+      TF_IN_AUTOMATION: 'true'
+      AWS_SDK_LOAD_CONFIG: '1'
+
+    bundles:
+      - path: tools/registry
+      - path: tools/edit_anthropic
+      - path: tools/review_on_submit_m
+
+    registry_variables:
+      USE_FILEMAP: 'true'
+      SUBMIT_REVIEW_MESSAGES:
+        - |
+          Terraform release checklist:
+
+          1. Run `terraform fmt`, `validate`, `tflint`, and security scanners (`tfsec`/`checkov`)
+          2. Generate and review `terraform plan` for each environment touched
+          3. Update module documentation/README and diagrams if architecture changed
+          4. Confirm remote state + backend config are correct and documented
+          5. Ensure secrets/config references exist (SSM, Vault, etc.)
+          6. Provide rollback guidance and tagging/cost notes
+
+          Fix issues before submitting.
+
+          Changes made:
+          <diff>
+          {{diff}}
+          </diff>
+
+    enable_bash_tool: true
+    parse_function:
+      type: function_calling
+
+  history_processors:
+    - type: cache_control
+      last_n_messages: 2

@@ -1,0 +1,91 @@
+# Specialized Agent Config: Mobile Android Engineer
+agent:
+  templates:
+    system_template: |-
+      You are a senior Android engineer specializing in Kotlin, Jetpack libraries, and Google Play release processes.
+
+      Expertise:
+      - Kotlin, Jetpack Compose/XML, Architecture Components (ViewModel, LiveData, Room)
+      - Coroutines/Flow, dependency injection (Hilt/Koin), modularization
+      - Networking (Retrofit, OkHttp), offline caching, WorkManager
+      - Testing (JUnit4/5, Espresso, Robolectric, Snapshot tests)
+      - Gradle build optimization, CI/CD pipelines, Play Store bundles
+      - Performance (profilers, startup time, memory, battery)
+      - Security (app signing, SafetyNet/Play Integrity, secure storage)
+
+      Principles:
+      1. Follow modern Android architecture guidance and clean boundaries
+      2. Prioritize responsiveness, offline handling, and graceful failures
+      3. Maintain accessibility, localization, theming (Material You, dark mode)
+      4. Document build variants, feature flags, release steps
+
+    instance_template: |-
+      <uploaded_files>
+      {{working_dir}}
+      </uploaded_files>
+      Android repo at {{working_dir}} requires updates:
+
+      <task_description>
+      {{problem_statement}}
+      </task_description>
+
+      Steps:
+      1. Inspect existing modules, Gradle setup, and architecture
+      2. Implement Kotlin changes with DI, proper threading, and error handling
+      3. Update Compose/UI components with state hoisting, previews, and accessibility
+      4. Modify Gradle configs, manifests, resources as needed
+      5. Add/update tests and run them locally (`./gradlew test connectedAndroidTest`)
+      6. Update Fastlane/Play Console configs or release notes if relevant
+      7. Document env requirements, feature flags, QA instructions
+      8. Run `submit` when done
+
+      IMPORTANT: Always call `submit` after completion.
+
+    next_step_template: |-
+      OBSERVATION:
+      {{observation}}
+
+    next_step_no_output_template: |-
+      Your command ran successfully and did not produce any output.
+
+  tools:
+    env_variables:
+      PAGER: cat
+      MANPAGER: cat
+      LESS: -R
+      TQDM_DISABLE: '1'
+      GIT_PAGER: cat
+      ANDROID_HOME: /opt/android-sdk
+
+    bundles:
+      - path: tools/registry
+      - path: tools/edit_anthropic
+      - path: tools/review_on_submit_m
+
+    registry_variables:
+      USE_FILEMAP: 'true'
+      SUBMIT_REVIEW_MESSAGES:
+        - |
+          Android release checklist:
+
+          1. Run `./gradlew lint detekt ktlintFormatCheck` (project-specific linters)
+          2. Execute unit + instrumentation tests (`./gradlew test connectedAndroidTest`)
+          3. Build release bundle/apk to ensure signing + shrinking succeed
+          4. Update versionCode/versionName and changelog if necessary
+          5. Validate Compose/UI on multiple form factors/emulators
+          6. Confirm CI pipelines incorporate new steps/settings
+
+          Resolve issues before submitting.
+
+          Changes made:
+          <diff>
+          {{diff}}
+          </diff>
+
+    enable_bash_tool: true
+    parse_function:
+      type: thought_action
+
+  history_processors:
+    - type: cache_control
+      last_n_messages: 2

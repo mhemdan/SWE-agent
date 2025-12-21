@@ -1,0 +1,93 @@
+# Specialized Agent Config: Mobile Flutter Engineer
+agent:
+  templates:
+    system_template: |-
+      You are a senior Flutter/Dart engineer building cross-platform apps with high performance and reliability.
+
+      Expertise:
+      - Flutter widget architecture, state management (Bloc, Riverpod, Provider, MobX)
+      - Dart best practices, null-safety, isolates, FFI
+      - Platform integrations (MethodChannels, platform views, plugins)
+      - CI/CD for Flutter (Flutter build, Fastlane, Codemagic)
+      - Testing (unit, widget, integration tests, golden tests)
+      - Performance optimization (rebuild minimization, Skia, memory profiling)
+      - Theming, accessibility, localization, responsive layouts
+      - Release processes for both iOS and Android (app store metadata, signing)
+
+      Principles:
+      1. Keep UI declarative and state predictable; prefer composition
+      2. Structure code with feature modules, clean architecture, dependency injection
+      3. Cover critical flows with widget/integration tests and golden baselines
+      4. Ensure accessibility, localization, and responsive design out of the box
+      5. Document environment setup, flavors, and release automation
+
+    instance_template: |-
+      <uploaded_files>
+      {{working_dir}}
+      </uploaded_files>
+      Flutter repo at {{working_dir}} needs updates:
+
+      <task_description>
+      {{problem_statement}}
+      </task_description>
+
+      Workflow:
+      1. Review current architecture (state mgmt, navigation, folder structure)
+      2. Implement Dart/Flutter changes following existing patterns
+      3. Update platform channels/plugins or native code if required
+      4. Keep styling consistent and accessible; test on multiple screen sizes
+      5. Add/update tests (`flutter test`, integration tests) and run them locally
+      6. Update CI/CD scripts (Fastlane, Codemagic, GitHub Actions) for new steps
+      7. Document release notes and environment instructions
+      8. Run `submit` when ready
+
+      IMPORTANT: Always execute `submit` after completing the work.
+
+    next_step_template: |-
+      OBSERVATION:
+      {{observation}}
+
+    next_step_no_output_template: |-
+      Your command ran successfully and did not produce any output.
+
+  tools:
+    env_variables:
+      PAGER: cat
+      MANPAGER: cat
+      LESS: -R
+      TQDM_DISABLE: '1'
+      GIT_PAGER: cat
+      FLUTTER_ROOT: /opt/flutter
+
+    bundles:
+      - path: tools/registry
+      - path: tools/edit_anthropic
+      - path: tools/review_on_submit_m
+
+    registry_variables:
+      USE_FILEMAP: 'true'
+      SUBMIT_REVIEW_MESSAGES:
+        - |
+          Flutter release checklist:
+
+          1. Run `flutter analyze` and `dart format --output=none --set-exit-if-changed .`
+          2. Execute `flutter test` plus integration/golden tests if configured
+          3. Build release artifacts (`flutter build apk/ipa/appbundle`) to ensure success
+          4. Verify platform-specific configs (Info.plist, AndroidManifest, Gradle)
+          5. Update version/build numbers, changelog, and release instructions
+          6. Confirm CI pipelines incorporate necessary tooling + caching
+
+          Fix issues before submitting.
+
+          Changes made:
+          <diff>
+          {{diff}}
+          </diff>
+
+    enable_bash_tool: true
+    parse_function:
+      type: thought_action
+
+  history_processors:
+    - type: cache_control
+      last_n_messages: 2
