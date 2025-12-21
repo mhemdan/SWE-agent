@@ -40,7 +40,7 @@ classifiers = [
 
 dependencies = [
     "datasets",
-    "numpy",
+    "numpy<2.0",  # Pin to 1.x for compatibility with older CPU architectures (no X86_V2 requirement)
     "pandas",
     "rich",
     "ruamel.yaml",
