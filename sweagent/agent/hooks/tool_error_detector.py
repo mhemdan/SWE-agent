@@ -38,7 +38,8 @@ class ToolErrorDetectorHook(AbstractAgentHook):
         enabled: bool = True,
         max_consecutive_tool_errors: int = 5,
         max_total_errors: int = 15,
-        max_same_error_message: int = 3,
+        max_same_error_message: int = 10,
+        force_submit_on_max_errors: bool = True,
     ):
         """
         Initialize tool error detector.
@@ -47,12 +48,14 @@ class ToolErrorDetectorHook(AbstractAgentHook):
             enabled: Whether the hook is active
             max_consecutive_tool_errors: Max consecutive failures of same tool before intervention
             max_total_errors: Max total errors in session before forcing submission
-            max_same_error_message: Max times same error message can appear
+            max_same_error_message: Max times same error message can appear before forcing submission
+            force_submit_on_max_errors: Whether to force submit when thresholds are exceeded
         """
         self.enabled = enabled
         self.max_consecutive_tool_errors = max_consecutive_tool_errors
         self.max_total_errors = max_total_errors
         self.max_same_error_message = max_same_error_message
+        self.force_submit_on_max_errors = force_submit_on_max_errors
 
         # Tracking state
         self._consecutive_errors = defaultdict(int)  # tool_name -> count
@@ -61,6 +64,43 @@ class ToolErrorDetectorHook(AbstractAgentHook):
         self._last_tool = None
         self._last_error = None
         self._intervention_count = 0
+        self._forced_submit = False
+
+    def on_actions_generated(self, *, step: StepOutput):
+        """
+        Intercept generated actions and force submit if error threshold exceeded.
+
+        This is called after the model generates an action but before it's executed.
+        If we've flagged that submission should be forced, we override the action.
+
+        Args:
+            step: The step output containing the generated action
+        """
+        if not self.enabled or not self.force_submit_on_max_errors:
+            return
+
+        if self._forced_submit and step.action != "submit":
+            logger.error(
+                f"ToolErrorDetectorHook: Forcing submit due to excessive errors. "
+                f"Overriding action: {step.action}"
+            )
+
+            # Force the action to be submit
+            original_action = step.action
+            step.action = "submit"
+
+            # Update thought to explain what happened
+            if step.thought:
+                step.thought = (
+                    f"{step.thought.rstrip()}\n\n"
+                    f"[ToolErrorDetectorHook: Excessive errors detected. "
+                    f"Forcing submission instead of: {original_action}]"
+                )
+            else:
+                step.thought = (
+                    f"[ToolErrorDetectorHook: Excessive errors detected. "
+                    f"Forcing submission to prevent infinite loop]"
+                )
 
     def on_step_done(self, *, step: StepOutput, info=None):
         """
@@ -198,6 +238,14 @@ class ToolErrorDetectorHook(AbstractAgentHook):
             f"ToolErrorDetectorHook: Same error appeared {count} times: {error_key}"
         )
 
+        # Force submit if same error appears way too many times
+        if count >= self.max_same_error_message * 2 and self.force_submit_on_max_errors:
+            logger.error(
+                f"ToolErrorDetectorHook: Same error appeared {count} times. "
+                f"Forcing submission to prevent infinite loop."
+            )
+            self._forced_submit = True
+
         step.observation = (
             f"{step.observation}\n\n"
             f"⚠️ SYSTEM INTERVENTION: This same error has occurred {count} times.\n"
@@ -212,15 +260,16 @@ class ToolErrorDetectorHook(AbstractAgentHook):
             f"({self.max_total_errors}). Forcing submission."
         )
 
+        # Set flag to force submit on next action
+        if self.force_submit_on_max_errors:
+            self._forced_submit = True
+
         step.observation = (
             f"{step.observation}\n\n"
             f"⛔ SYSTEM INTERVENTION: Too many errors ({self._total_errors}) encountered in this session.\n"
             f"You must now submit your work. Use the `submit` command to save your progress.\n"
             f"Do not attempt any more file operations."
         )
-
-        # Optionally force submit on next action
-        # (We'll let the agent do it in response to the strong message)
 
     def _get_alternative_suggestion(self, tool_name: str) -> str:
         """Get suggestion for alternative approach based on failing tool."""
@@ -260,6 +309,7 @@ class ToolErrorDetectorHook(AbstractAgentHook):
             "total_errors": self._total_errors,
             "consecutive_errors": dict(self._consecutive_errors),
             "intervention_count": self._intervention_count,
+            "forced_submit": self._forced_submit,
             "thresholds": {
                 "max_consecutive": self.max_consecutive_tool_errors,
                 "max_total": self.max_total_errors,

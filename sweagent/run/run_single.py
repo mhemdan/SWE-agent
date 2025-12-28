@@ -189,13 +189,15 @@ class RunSingle:
             # Configure thresholds via environment variables
             max_consecutive = int(os.environ.get("SWE_AGENT_MAX_CONSECUTIVE_TOOL_ERRORS", "5"))
             max_total = int(os.environ.get("SWE_AGENT_MAX_TOTAL_ERRORS", "15"))
-            max_same_error = int(os.environ.get("SWE_AGENT_MAX_SAME_ERROR", "3"))
+            max_same_error = int(os.environ.get("SWE_AGENT_MAX_SAME_ERROR", "10"))
+            force_submit = os.environ.get("SWE_AGENT_FORCE_SUBMIT_ON_MAX_ERRORS", "true").lower() in ("1", "true", "yes")
 
             agent.add_hook(
                 ToolErrorDetectorHook(
                     max_consecutive_tool_errors=max_consecutive,
                     max_total_errors=max_total,
                     max_same_error_message=max_same_error,
+                    force_submit_on_max_errors=force_submit,
                 )
             )
 
