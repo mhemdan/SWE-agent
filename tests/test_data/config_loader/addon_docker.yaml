@@ -1,0 +1,8 @@
+agent:
+  tools:
+    bundles:
+      - +path: tools/docker_bundle
+    env_variables:
+      DOCKER_BUILDKIT: '1'
+custom_steps:
+  - +deploy

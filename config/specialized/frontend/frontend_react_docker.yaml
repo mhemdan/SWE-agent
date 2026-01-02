@@ -1,0 +1,12 @@
+# Specialized Agent Config: React + Docker Addon
+extends:
+  - frontend_react.yaml
+  - ../../addons/docker.yaml
+
+agent:
+  templates:
+    system_template: |-
+      You inherit the standard React engineer skillset plus containerization expertise for Docker-based delivery workflows.
+  tools:
+    env_variables:
+      REACT_CONTAINERIZED: 'true'

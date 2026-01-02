@@ -27,6 +27,13 @@ agent:
       7. When you are completely done with all changes and have verified they work, you MUST call the `submit` command to finalize your work
       Your thinking should be thorough and so it's fine if it's very long.
 
+      CRITICAL CONSTRAINTS - Documentation & Efficiency:
+      - Do NOT create README, SUMMARY, GUIDE, CHECKLIST, or documentation markdown files
+      - Do NOT create IMPLEMENTATION_SUMMARY.md, CHANGELOG.md, or similar documentation files
+      - Focus EXCLUSIVELY on source code implementation, tests, and configuration
+      - Use inline code comments for documentation only
+      - Exception: Only create/update README files if EXPLICITLY requested in the <pr_description>
+
       IMPORTANT: You MUST call the `submit` command when you have finished making all changes. This is required to save your work and create a pull request.
     next_step_template: |-
       OBSERVATION:

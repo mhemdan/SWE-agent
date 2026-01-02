@@ -15,7 +15,6 @@ import argparse
 import logging
 from pathlib import Path
 
-import yaml
 from rich.prompt import Prompt
 from swerex.deployment.config import DockerDeploymentConfig
 
@@ -32,6 +31,7 @@ from sweagent.environment.repo import PreExistingRepoConfig
 from sweagent.environment.swe_env import EnvironmentConfig, SWEEnv
 from sweagent.run.common import save_predictions
 from sweagent.run.hooks.abstract import CombinedRunHooks, RunHook
+from sweagent.config import ConfigLoader
 from sweagent.utils.config import load_environment_variables
 from sweagent.utils.github import _is_github_issue_url
 from sweagent.utils.log import add_file_handler, get_logger, set_stream_handler_levels
@@ -133,7 +133,9 @@ def run_from_cli(args: list[str] | None = None):
             python_standalone_dir="/root",
         ),
     )
-    agent_config = ShellAgentConfig.model_validate(yaml.safe_load(cli_args.config.read_text())["agent"])
+    loader = ConfigLoader()
+    config_data = loader.load_config(cli_args.config)
+    agent_config = ShellAgentConfig.model_validate(config_data["agent"])
     agent = ShellAgent.from_config(agent_config)
     env = SWEEnv.from_config(env_config)
     if cli_args.repo is None:

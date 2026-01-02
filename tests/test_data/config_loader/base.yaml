@@ -1,0 +1,10 @@
+agent:
+  tools:
+    bundles:
+      - path: tools/base_bundle
+    env_variables:
+      BASE_FLAG: enabled
+  templates:
+    system_template: Base Template
+custom_steps:
+  - setup

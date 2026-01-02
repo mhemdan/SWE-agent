@@ -5,6 +5,7 @@ from swerex.runtime.abstract import Action, BashObservation, Observation
 from swerex.runtime.dummy import DummyRuntime
 
 from sweagent import CONFIG_DIR
+from sweagent.config import ConfigLoader
 from sweagent.agent.agents import DefaultAgent, DefaultAgentConfig
 from sweagent.agent.models import InstantEmptySubmitModelConfig, PredeterminedTestModel
 from sweagent.agent.problem_statement import EmptyProblemStatement, TextProblemStatement
@@ -49,7 +50,7 @@ def function_calling_agent_config():
 
 @pytest.fixture
 def default_agent_config():
-    config = yaml.safe_load((CONFIG_DIR / "sweagent_0_7/07.yaml").read_text())
+    config = ConfigLoader().load_config(CONFIG_DIR / "sweagent_0_7/07.yaml")
     config["agent"]["model"] = {"name": "instant_empty_submit"}
     print(yaml.dump(config))
     return DefaultAgentConfig.model_validate(config["agent"])

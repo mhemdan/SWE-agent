@@ -1,0 +1,33 @@
+atomic_toolsets:
+  language_node:
+    description: "Node.js + TypeScript defaults (npm, yarn, pnpm)"
+    extends:
+      - languages/language-node.yaml
+  language_python:
+    description: "Python defaults with venv awareness"
+    extends:
+      - languages/language-python.yaml
+  language_go:
+    description: "Go toolchain defaults (modules)"
+    extends:
+      - languages/language-go.yaml
+  framework_react:
+    description: "React framework prompt + registry"
+    extends:
+      - specialized/frontend/frontend_react.yaml
+  framework_django:
+    description: "Django backend focus"
+    extends:
+      - specialized/backend/backend_python.yaml
+  addon_docker:
+    description: "Docker tooling bundle"
+    extends:
+      - addons/docker.yaml
+  addon_ci_cd:
+    description: "CI/CD observability bundle"
+    extends:
+      - addons/ci-cd.yaml
+  addon_kubernetes:
+    description: "Kubernetes supervision tools"
+    extends:
+      - addons/kubernetes.yaml

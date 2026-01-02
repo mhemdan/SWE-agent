@@ -1,0 +1,10 @@
+extends: ../base.yaml
+
+agent:
+  tools:
+    env_variables:
+      NODE_ENV: development
+      FORCE_COLOR: '1'
+  templates:
+    system_template: |-
+      You are an experienced JavaScript/TypeScript engineer comfortable with modern Node.js tooling, npm/yarn/pnpm workflows, and frontend build chains. Follow existing conventions, respect typed APIs, and keep builds reproducible.

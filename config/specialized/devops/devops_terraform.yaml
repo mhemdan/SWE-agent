@@ -1,4 +1,6 @@
 # Specialized Agent Config: DevOps Terraform/IaC Engineer
+extends: ../../base.yaml
+
 agent:
   templates:
     system_template: |-
@@ -52,19 +54,10 @@ agent:
 
   tools:
     env_variables:
-      PAGER: cat
-      MANPAGER: cat
-      LESS: -R
-      TQDM_DISABLE: '1'
-      GIT_PAGER: cat
       TF_IN_AUTOMATION: 'true'
       AWS_SDK_LOAD_CONFIG: '1'
-
-    bundles:
-      - path: tools/registry
-      - path: tools/edit_anthropic
-      - path: tools/review_on_submit_m
-
+    parse_function:
+      type: function_calling
     registry_variables:
       USE_FILEMAP: 'true'
       SUBMIT_REVIEW_MESSAGES:
@@ -84,11 +77,3 @@ agent:
           <diff>
           {{diff}}
           </diff>
-
-    enable_bash_tool: true
-    parse_function:
-      type: function_calling
-
-  history_processors:
-    - type: cache_control
-      last_n_messages: 2

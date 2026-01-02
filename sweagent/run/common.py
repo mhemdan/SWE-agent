@@ -16,6 +16,7 @@ from rich import print as rich_print
 from rich.panel import Panel
 
 from sweagent import CONFIG_DIR
+from sweagent.config import ConfigLoader
 from sweagent.types import AgentInfo, AgentRunResult
 from sweagent.utils.log import get_logger
 from sweagent.utils.serialization import merge_nested_dicts
@@ -209,6 +210,7 @@ class BasicCLI:
         self.logger = get_logger("swea-cli", emoji="🔧")
         self.help_text = help_text
         self.default_config_file = default_config_file
+        self.config_loader = ConfigLoader()
 
     def maybe_show_auto_correct(self, args: list[str]):
         auto_correct = []
@@ -290,12 +292,10 @@ class BasicCLI:
         if cli_args.config:
             config_files.extend(cli_args.config)
             for _f in cli_args.config:
-                txt = Path(_f).read_text()
-                if not txt.strip():
-                    self.logger.warning(f"Config file {_f} is empty")
+                config_data = self._load_config_file(Path(_f))
+                if config_data is None:
                     continue
-                _loaded = yaml.safe_load(txt)
-                merge_nested_dicts(config_merged, _loaded)
+                merge_nested_dicts(config_merged, config_data)
         elif self.default_settings and not cli_args.no_config_file:
             config_file = self.default_config_file
             config_files.append(config_file)
@@ -304,12 +304,8 @@ class BasicCLI:
                 "config file is specified. Specify --no_config_file to disable this."
             )
             self.logger.info(msg)
-            txt = config_file.read_text()
-            if not txt.strip():
-                self.logger.warning(f"Default config file {config_file} is empty")
-                config_merged = {}
-            else:
-                config_merged = yaml.safe_load(txt)
+            config_data = self._load_config_file(config_file)
+            config_merged = config_data or {}
         else:
             config_merged = {}
 
@@ -365,6 +361,13 @@ class BasicCLI:
         # (the output traj directory is named after the last config file)
         config._config_files = config_files  # type: ignore
         return config
+
+    def _load_config_file(self, path: Path) -> dict | None:
+        txt = path.read_text()
+        if not txt.strip():
+            self.logger.warning(f"Config file {path} is empty")
+            return None
+        return self.config_loader.load_config(path)
 
 
 def save_predictions(traj_dir: Path, instance_id: str, result: AgentRunResult):

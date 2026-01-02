@@ -1,0 +1,8 @@
+# Kubernetes observability addon
+agent:
+  tools:
+    env_variables:
+      KUBECTL_EXTERNAL_DIFF: "diff -u"
+      KUBECONFIG: /root/.kube/config
+    bundles:
+      - +path: tools/kubernetes

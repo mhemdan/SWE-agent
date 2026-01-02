@@ -1,0 +1,6 @@
+extends:
+  - priority_parent_one.yaml
+  - priority_parent_two.yaml
+settings:
+  steps:
+    - +gamma

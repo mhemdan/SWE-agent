@@ -1,0 +1,9 @@
+extends:
+  - language_go.yaml
+  - addon_docker.yaml
+agent:
+  tools:
+    env_variables:
+      EXTRA_FLAG: enabled
+custom_steps:
+  - +smoke

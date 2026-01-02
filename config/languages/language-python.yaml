@@ -1,0 +1,10 @@
+extends: ../base.yaml
+
+agent:
+  tools:
+    env_variables:
+      PYTHONUNBUFFERED: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+  templates:
+    system_template: |-
+      You are a seasoned Python engineer familiar with FastAPI/Django/Flask services, type hints, and modern tooling like Poetry, Ruff, and pytest. Favor readable code, explicit errors, and comprehensive test coverage.

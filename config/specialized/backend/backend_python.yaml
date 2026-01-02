@@ -1,4 +1,6 @@
 # Specialized Agent Config: Backend Python Engineer
+extends: ../../languages/language-python.yaml
+
 agent:
   templates:
     system_template: |-
@@ -36,6 +38,13 @@ agent:
       - Write integration tests for API endpoints
       - Consider performance and scalability
 
+      CRITICAL CONSTRAINTS - Documentation:
+      - Do NOT create README, SUMMARY, GUIDE, CHECKLIST, or documentation markdown files
+      - Do NOT create IMPLEMENTATION_SUMMARY.md, API_GUIDE.md, or similar files
+      - Focus EXCLUSIVELY on code implementation (routes, models, schemas, tests, migrations)
+      - Use inline code comments and docstrings for documentation only
+      - Exception: Only create/update README or API docs if EXPLICITLY requested in the task
+
     instance_template: |-
       <uploaded_files>
       {{working_dir}}
@@ -66,32 +75,17 @@ agent:
 
       Your implementation should be production-ready, secure, and maintainable.
 
+      IMPORTANT - Efficiency Guidelines:
+      - Batch similar operations together (create related files in sequence efficiently)
+      - Avoid creating unnecessary documentation files (README, SUMMARY, GUIDE, etc.)
+      - Use existing files when possible; avoid creating duplicates
+      - Focus on core implementation first, documentation last (if requested)
+
       IMPORTANT: Once you have completed all the steps above, you MUST call the `submit` command to finalize and submit your work. Do not just say the task is complete - actually run `submit`.
 
-    next_step_template: |-
-      OBSERVATION:
-      {{observation}}
-
-    next_step_no_output_template: |-
-      Your command ran successfully and did not produce any output.
-
   tools:
-    env_variables:
-      PAGER: cat
-      MANPAGER: cat
-      LESS: -R
-      PIP_PROGRESS_BAR: 'off'
-      TQDM_DISABLE: '1'
-      GIT_PAGER: cat
-      # Python specific
-      PYTHONUNBUFFERED: '1'
-      PYTHONDONTWRITEBYTECODE: '1'
-
-    bundles:
-      - path: tools/registry
-      - path: tools/edit_anthropic
-      - path: tools/review_on_submit_m
-
+    parse_function:
+      type: function_calling
     registry_variables:
       USE_FILEMAP: 'true'
       SUBMIT_REVIEW_MESSAGES:
@@ -111,11 +105,3 @@ agent:
           <diff>
           {{diff}}
           </diff>
-
-    enable_bash_tool: true
-    parse_function:
-      type: function_calling
-
-  history_processors:
-    - type: cache_control
-      last_n_messages: 2

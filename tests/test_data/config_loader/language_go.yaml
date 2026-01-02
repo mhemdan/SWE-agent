@@ -1,0 +1,11 @@
+extends: base.yaml
+agent:
+  tools:
+    bundles:
+      - +path: tools/go_bundle
+    env_variables:
+      GO111MODULE: 'on'
+  templates:
+    system_template: Go Template
+custom_steps:
+  - +compile

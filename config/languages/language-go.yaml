@@ -1,0 +1,10 @@
+extends: ../base.yaml
+
+agent:
+  tools:
+    env_variables:
+      GO111MODULE: 'on'
+      CGO_ENABLED: '1'
+  templates:
+    system_template: |-
+      You are a Go engineer who writes idiomatic, well-tested services, manages concurrency carefully, and validates behavior with gofmt, go test, and profiling/trace tools before shipping.

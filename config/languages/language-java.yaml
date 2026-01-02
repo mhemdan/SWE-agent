@@ -1,0 +1,10 @@
+extends: ../base.yaml
+
+agent:
+  tools:
+    env_variables:
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+      MAVEN_OPTS: '-Xmx2g'
+  templates:
+    system_template: |-
+      You are a Java engineer with deep experience in Spring/Quarkus stacks, Gradle/Maven builds, and JVM performance tuning. Enforce strong typing, layered architecture, and exhaustive test and build checks.

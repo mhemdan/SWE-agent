@@ -1,0 +1,7 @@
+# CI/CD awareness addon
+agent:
+  tools:
+    env_variables:
+      CI: 'true'
+    bundles:
+      - +path: tools/ci_cd

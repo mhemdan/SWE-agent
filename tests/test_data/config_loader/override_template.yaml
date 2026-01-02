@@ -1,0 +1,4 @@
+extends: base.yaml
+agent:
+  templates:
+    system_template: Specialized Template

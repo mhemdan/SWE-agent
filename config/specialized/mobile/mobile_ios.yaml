@@ -1,4 +1,6 @@
 # Specialized Agent Config: Mobile iOS Engineer
+extends: ../../base.yaml
+
 agent:
   templates:
     system_template: |-
@@ -51,18 +53,7 @@ agent:
 
   tools:
     env_variables:
-      PAGER: cat
-      MANPAGER: cat
-      LESS: -R
-      TQDM_DISABLE: '1'
-      GIT_PAGER: cat
       LANG: en_US.UTF-8
-
-    bundles:
-      - path: tools/registry
-      - path: tools/edit_anthropic
-      - path: tools/review_on_submit_m
-
     registry_variables:
       USE_FILEMAP: 'true'
       SUBMIT_REVIEW_MESSAGES:
@@ -82,11 +73,3 @@ agent:
           <diff>
           {{diff}}
           </diff>
-
-    enable_bash_tool: true
-    parse_function:
-      type: thought_action
-
-  history_processors:
-    - type: cache_control
-      last_n_messages: 2

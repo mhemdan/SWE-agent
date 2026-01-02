@@ -1,0 +1,4 @@
+settings:
+  prompt: first
+  steps:
+    - alpha

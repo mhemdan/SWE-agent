@@ -1,0 +1,10 @@
+# Docker tooling addon
+agent:
+  tools:
+    env_variables:
+      DOCKER_BUILDKIT: '1'
+      DOCKER_SCAN_SUGGEST: 'false'
+    bundles:
+      - +path: tools/docker
+    registry_variables:
+      DOCKER_CONTEXT: default
