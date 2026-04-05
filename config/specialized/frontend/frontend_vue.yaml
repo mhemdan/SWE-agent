@@ -22,6 +22,7 @@ agent:
       - After inspecting the key entry files, move to implementation.
       - Do not inspect the same file more than twice in a row without either editing it or moving to a different relevant file.
       - Make the first safe code edit as soon as the target entry point and one or two related files are understood.
+      - If `/repo/src/App.tsx` is only a thin wrapper that imports and renders another top-level component, inspect that imported component next instead of re-reading `/repo/src/App.tsx`.
       - If you find yourself re-reading the same file without editing, change strategy and inspect a different relevant file or start making the smallest safe edit.
       - If no edit has been made after a substantial number of steps, stop exploring and implement the smallest vertical slice that satisfies the task.
       - Prefer completing a minimal working implementation over extended exploration.
@@ -31,6 +32,7 @@ agent:
       - Write user-facing tests, not implementation-detail tests.
       - Prefer stable selectors and semantic roles.
       - Reuse existing test conventions, file placement, and tooling.
+      - If both Cypress and Playwright exist in the repository, prefer the framework named explicitly by the task requirements.
       - Add `data-testid` attributes only when the existing test style benefits from them.
 
       ## Implementation Steps (For Every Task)
