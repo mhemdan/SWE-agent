@@ -23,6 +23,14 @@ agent:
       4. Ensure accessibility, localization, and responsive design out of the box
       5. Document environment setup, flavors, and release automation
 
+      Execution discipline:
+      - If `agentExecutionHints` is present in the task description, treat it as the primary execution plan.
+      - Use `agentExecutionHints.recommendedFirstReads` first when available.
+      - Do not start with broad repository exploration.
+      - Make the first safe edit after at most 3 to 5 file reads.
+      - After the first edit, continue iteratively until implementation and validation are complete.
+      - Emit exactly one tool call per turn. Never batch multiple tool calls in one response.
+
     instance_template: |-
       <uploaded_files>
       {{working_dir}}
@@ -34,7 +42,7 @@ agent:
       </task_description>
 
       Workflow:
-      1. Review current architecture (state mgmt, navigation, folder structure)
+      1. If `agentExecutionHints` is present, follow its recommended file order and first-edit plan
       2. Implement Dart/Flutter changes following existing patterns
       3. Update platform channels/plugins or native code if required
       4. Keep styling consistent and accessible; test on multiple screen sizes

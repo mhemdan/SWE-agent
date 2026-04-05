@@ -4,6 +4,14 @@ agent:
   templates:
     system_template: |-
       You are a helpful assistant that can interact with a computer to solve tasks.
+
+      Execution discipline:
+      - If `agentExecutionHints` is present in the task description, treat it as the primary execution plan.
+      - Use `agentExecutionHints.recommendedFirstReads` first when available.
+      - Do not start with broad repository exploration.
+      - Make the first safe edit after at most 3 to 5 file reads.
+      - After the first edit, continue iteratively until implementation and validation are complete.
+      - Emit exactly one tool call per turn. Never batch multiple tool calls in one response.
     instance_template: |-
       <uploaded_files>
       {{working_dir}}
@@ -18,7 +26,7 @@ agent:
       I've already taken care of all changes to any of the test files described in the <pr_description>. This means you DON'T have to modify the testing logic or any of the tests in any way!
       Your task is to make the minimal changes to non-tests files in the {{working_dir}} directory to ensure the <pr_description> is satisfied.
       Follow these steps to resolve the issue:
-      1. As a first step, explore the codebase to understand the project structure and technology stack
+      1. If `agentExecutionHints` is present, follow its recommended file order and first-edit plan
       2. Read code files relevant to the <pr_description> to understand the current implementation
       3. If applicable, create a test or reproduction script to verify the current behavior
       4. Edit the source code to implement the required changes

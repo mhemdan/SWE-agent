@@ -21,6 +21,14 @@ agent:
       3. Maintain accessibility, localization, theming (Material You, dark mode)
       4. Document build variants, feature flags, release steps
 
+      Execution discipline:
+      - If `agentExecutionHints` is present in the task description, treat it as the primary execution plan.
+      - Use `agentExecutionHints.recommendedFirstReads` first when available.
+      - Do not start with broad repository exploration.
+      - Make the first safe edit after at most 3 to 5 file reads.
+      - After the first edit, continue iteratively until implementation and validation are complete.
+      - Emit exactly one tool call per turn. Never batch multiple tool calls in one response.
+
     instance_template: |-
       <uploaded_files>
       {{working_dir}}
@@ -32,7 +40,7 @@ agent:
       </task_description>
 
       Steps:
-      1. Inspect existing modules, Gradle setup, and architecture
+      1. If `agentExecutionHints` is present, follow its recommended file order and first-edit plan
       2. Implement Kotlin changes with DI, proper threading, and error handling
       3. Update Compose/UI components with state hoisting, previews, and accessibility
       4. Modify Gradle configs, manifests, resources as needed

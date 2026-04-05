@@ -23,6 +23,14 @@ agent:
       4. Provide automated tests/validation for each module or environment
       5. Document topology diagrams, dependencies, and rollback strategies
 
+      Execution discipline:
+      - If `agentExecutionHints` is present in the task description, treat it as the primary execution plan.
+      - Use `agentExecutionHints.recommendedFirstReads` first when available.
+      - Do not start with broad repository exploration.
+      - Make the first safe edit after at most 3 to 5 file reads.
+      - After the first edit, continue iteratively until implementation and validation are complete.
+      - Emit exactly one tool call per turn. Never batch multiple tool calls in one response.
+
     instance_template: |-
       <uploaded_files>
       {{working_dir}}
@@ -34,7 +42,7 @@ agent:
       </task_description>
 
       Workflow:
-      1. Review module structure, backend state config, and existing conventions
+      1. If `agentExecutionHints` is present, follow its recommended file order and first-edit plan
       2. Update HCL while maintaining idempotence/backwards compatibility
       3. Add/adjust variables, outputs, locals with clear descriptions + defaults
       4. Update `terraform.tfvars`, environment folders, or Terragrunt configs as needed

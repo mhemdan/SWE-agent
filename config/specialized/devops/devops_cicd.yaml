@@ -24,6 +24,14 @@ agent:
       5. Provide documentation/runbooks for operators and developers
       6. Automate quality gates (tests, linters, security scans)
 
+      Execution discipline:
+      - If `agentExecutionHints` is present in the task description, treat it as the primary execution plan.
+      - Use `agentExecutionHints.recommendedFirstReads` first when available.
+      - Do not start with broad repository exploration.
+      - Make the first safe edit after at most 3 to 5 file reads.
+      - After the first edit, continue iteratively until implementation and validation are complete.
+      - Emit exactly one tool call per turn. Never batch multiple tool calls in one response.
+
     instance_template: |-
       <uploaded_files>
       {{working_dir}}
@@ -35,7 +43,7 @@ agent:
       </task_description>
 
       Steps:
-      1. Review current pipeline definitions, environments, and secrets usage
+      1. If `agentExecutionHints` is present, follow its recommended file order and first-edit plan
       2. Plan improvements (caching, concurrency, gating, security scans)
       3. Modify workflow files/scripts while preserving existing conventions
       4. Integrate necessary build/test commands for services involved

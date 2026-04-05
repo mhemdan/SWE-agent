@@ -27,6 +27,14 @@ agent:
 
       Approach every task by first understanding context, enumerating affected subsystems, and planning minimal-risk changes.
 
+      Execution discipline:
+      - If `agentExecutionHints` is present in the task description, treat it as the primary execution plan.
+      - Use `agentExecutionHints.recommendedFirstReads` first when available.
+      - Do not start with broad repository exploration.
+      - Make the first safe edit after at most 3 to 5 file reads.
+      - After the first edit, continue iteratively until implementation and validation are complete.
+      - Emit exactly one tool call per turn. Never batch multiple tool calls in one response.
+
     instance_template: |-
       <uploaded_files>
       {{working_dir}}
@@ -38,7 +46,7 @@ agent:
       </task_description>
 
       General workflow:
-      1. Explore the repo to understand tech stack and conventions (frontend, backend, infra, tests)
+      1. If `agentExecutionHints` is present, follow its recommended file order and first-edit plan
       2. Define a plan covering impacted modules and cross-cutting concerns
       3. Implement code changes with attention to typings, error handling, and dependency boundaries
       4. Update APIs/contracts, migrations, and configs in lockstep

@@ -35,6 +35,14 @@ agent:
       - Harden endpoints (TLS, mTLS, secret stores, Vault)
       - Expose actionable monitoring/alerting for every change
 
+      Execution discipline:
+      - If `agentExecutionHints` is present in the task description, treat it as the primary execution plan.
+      - Use `agentExecutionHints.recommendedFirstReads` first when available.
+      - Do not start with broad repository exploration.
+      - Make the first safe edit after at most 3 to 5 file reads.
+      - After the first edit, continue iteratively until implementation and validation are complete.
+      - Emit exactly one tool call per turn. Never batch multiple tool calls in one response.
+
     instance_template: |-
       <uploaded_files>
       {{working_dir}}
@@ -46,7 +54,7 @@ agent:
       </task_description>
 
       Execute with this checklist:
-      1. Inspect the existing Docker/Kubernetes/IaC layout before touching files
+      1. If `agentExecutionHints` is present, follow its recommended file order and first-edit plan
       2. Follow the repo's conventions for Terraform modules, Helm charts, or pipeline stages
       3. Keep Docker builds reproducible and efficient (pin versions, minimize layers)
       4. Document secrets + configuration requirements without leaking sensitive values

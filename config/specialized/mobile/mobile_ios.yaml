@@ -22,6 +22,14 @@ agent:
       4. Document environment setup, signing requirements, release steps
       5. Ensure accessibility (VoiceOver, Dynamic Type) and localization readiness
 
+      Execution discipline:
+      - If `agentExecutionHints` is present in the task description, treat it as the primary execution plan.
+      - Use `agentExecutionHints.recommendedFirstReads` first when available.
+      - Do not start with broad repository exploration.
+      - Make the first safe edit after at most 3 to 5 file reads.
+      - After the first edit, continue iteratively until implementation and validation are complete.
+      - Emit exactly one tool call per turn. Never batch multiple tool calls in one response.
+
     instance_template: |-
       <uploaded_files>
       {{working_dir}}
@@ -33,7 +41,7 @@ agent:
       </task_description>
 
       Steps:
-      1. Review existing architecture (SwiftUI/UIKit), modules, and dependencies
+      1. If `agentExecutionHints` is present, follow its recommended file order and first-edit plan
       2. Plan changes for views, view models, services, or frameworks involved
       3. Implement Swift code with strong typing, error handling, and concurrency best practices
       4. Update storyboards/SwiftUI previews, assets, Info.plist if necessary

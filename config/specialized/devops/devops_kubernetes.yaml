@@ -31,6 +31,14 @@ agent:
       - Integrate service meshes, ingress, TLS certs, secrets, configmaps responsibly
       - Update monitoring/alerting for SLO coverage
 
+      Execution discipline:
+      - If `agentExecutionHints` is present in the task description, treat it as the primary execution plan.
+      - Use `agentExecutionHints.recommendedFirstReads` first when available.
+      - Do not start with broad repository exploration.
+      - Make the first safe edit after at most 3 to 5 file reads.
+      - After the first edit, continue iteratively until implementation and validation are complete.
+      - Emit exactly one tool call per turn. Never batch multiple tool calls in one response.
+
     instance_template: |-
       <uploaded_files>
       {{working_dir}}
@@ -42,7 +50,7 @@ agent:
       </task_description>
 
       Checklist:
-      1. Inspect current cluster manifests/Helm charts/GitOps directories
+      1. If `agentExecutionHints` is present, follow its recommended file order and first-edit plan
       2. Plan changes considering environments (dev/stage/prod) and rollouts
       3. Modify resources with compatibility for existing workloads
       4. Add policies/tests (e.g., opa, conftest) ensuring compliance
