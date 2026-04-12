@@ -114,7 +114,7 @@ agent:
     env_variables:
       NG_CLI_ANALYTICS: 'false'
     parse_function:
-      type: function_calling
+      type: thought_action
     registry_variables:
       USE_FILEMAP: 'true'
       SUBMIT_REVIEW_MESSAGES:

@@ -58,7 +58,7 @@ agent:
 
   tools:
     parse_function:
-      type: function_calling
+      type: thought_action
     registry_variables:
       USE_FILEMAP: 'true'
       SUBMIT_REVIEW_MESSAGES:

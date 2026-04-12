@@ -65,7 +65,7 @@ agent:
       TF_IN_AUTOMATION: 'true'
       AWS_SDK_LOAD_CONFIG: '1'
     parse_function:
-      type: function_calling
+      type: thought_action
     registry_variables:
       USE_FILEMAP: 'true'
       SUBMIT_REVIEW_MESSAGES:

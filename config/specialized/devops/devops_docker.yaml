@@ -72,7 +72,7 @@ agent:
       DOCKER_SCAN_SUGGEST: 'false'
       KUBECTL_EXTERNAL_DIFF: "diff -u"
     parse_function:
-      type: function_calling
+      type: thought_action
     registry_variables:
       USE_FILEMAP: 'true'
       SUBMIT_REVIEW_MESSAGES:
