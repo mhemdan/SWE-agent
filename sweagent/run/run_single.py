@@ -66,7 +66,9 @@ class RunSingleActionConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-def _get_default_output_dir(output_dir: Path, problem_statement: ProblemStatement, agent: AgentConfig) -> Path:
+def _get_default_output_dir(
+    output_dir: Path, problem_statement: ProblemStatement, agent: AgentConfig
+) -> Path:
     if output_dir == Path("DEFAULT"):
         user_id = getpass.getuser()
         problem_id = problem_statement.id
@@ -77,12 +79,19 @@ def _get_default_output_dir(output_dir: Path, problem_statement: ProblemStatemen
         config_file = getattr(agent, "_config_files", ["no_config"])[0]
         if isinstance(config_file, Path):
             config_file = config_file.stem
-        return Path.cwd() / "trajectories" / user_id / f"{config_file}__{model_id}___{problem_id}"
+        return (
+            Path.cwd()
+            / "trajectories"
+            / user_id
+            / f"{config_file}__{model_id}___{problem_id}"
+        )
     return output_dir
 
 
 class RunSingleConfig(BaseSettings, cli_implicit_flags=False):
-    env: EnvironmentConfig = Field(default_factory=EnvironmentConfig, description="Environment options.")
+    env: EnvironmentConfig = Field(
+        default_factory=EnvironmentConfig, description="Environment options."
+    )
     agent: AgentConfig = Field(description="Agent options.")
     problem_statement: ProblemStatementConfig = Field(
         default_factory=EmptyProblemStatement, description="Problem statement options."
@@ -94,13 +103,18 @@ class RunSingleConfig(BaseSettings, cli_implicit_flags=False):
     env_var_path: Path | None = None
     """Path to a .env file to load environment variables from."""
 
+    mcp_config_path: Path | None = None
+    """Path to a JSON file containing MCP server config (mcpServers dict)."""
+
     # pydantic config
     model_config = SettingsConfigDict(extra="forbid", env_prefix="SWE_AGENT_")
 
     def set_default_output_dir(self) -> None:
         # Needs to be called explicitly, because self._config_files will be setup
         # post-init.
-        self.output_dir = _get_default_output_dir(self.output_dir, self.problem_statement, self.agent)
+        self.output_dir = _get_default_output_dir(
+            self.output_dir, self.problem_statement, self.agent
+        )
 
     @classmethod
     def _get_auto_correct(cls) -> list[ACS]:
@@ -165,6 +179,8 @@ class RunSingle:
     @classmethod
     def from_config(cls, config: RunSingleConfig) -> Self:
         load_environment_variables(config.env_var_path)
+        if config.mcp_config_path:
+            os.environ["SWE_AGENT_MCP_CONFIG_PATH"] = str(config.mcp_config_path)
         config.set_default_output_dir()
         config.output_dir.mkdir(parents=True, exist_ok=True)
         agent = get_agent_from_config(config.agent)
@@ -175,22 +191,30 @@ class RunSingle:
             agent.add_hook(ActivityStreamAgentHook(Path(activity_path)))
 
         # Add completion detector hook if enabled (helps prevent infinite loops)
-        completion_detector_enabled = os.environ.get("SWE_AGENT_COMPLETION_DETECTOR", "true").lower() in ("1", "true", "yes")
+        completion_detector_enabled = os.environ.get(
+            "SWE_AGENT_COMPLETION_DETECTOR", "true"
+        ).lower() in ("1", "true", "yes")
         if completion_detector_enabled:
             from sweagent.agent.hooks.completion_detector import CompletionDetectorHook
 
             agent.add_hook(CompletionDetectorHook())
 
         # Add tool error detector hook if enabled (prevents retry loops)
-        tool_error_detector_enabled = os.environ.get("SWE_AGENT_TOOL_ERROR_DETECTOR", "true").lower() in ("1", "true", "yes")
+        tool_error_detector_enabled = os.environ.get(
+            "SWE_AGENT_TOOL_ERROR_DETECTOR", "true"
+        ).lower() in ("1", "true", "yes")
         if tool_error_detector_enabled:
             from sweagent.agent.hooks.tool_error_detector import ToolErrorDetectorHook
 
             # Configure thresholds via environment variables
-            max_consecutive = int(os.environ.get("SWE_AGENT_MAX_CONSECUTIVE_TOOL_ERRORS", "5"))
+            max_consecutive = int(
+                os.environ.get("SWE_AGENT_MAX_CONSECUTIVE_TOOL_ERRORS", "5")
+            )
             max_total = int(os.environ.get("SWE_AGENT_MAX_TOTAL_ERRORS", "15"))
             max_same_error = int(os.environ.get("SWE_AGENT_MAX_SAME_ERROR", "10"))
-            force_submit = os.environ.get("SWE_AGENT_FORCE_SUBMIT_ON_MAX_ERRORS", "true").lower() in ("1", "true", "yes")
+            force_submit = os.environ.get(
+                "SWE_AGENT_FORCE_SUBMIT_ON_MAX_ERRORS", "true"
+            ).lower() in ("1", "true", "yes")
 
             agent.add_hook(
                 ToolErrorDetectorHook(
@@ -209,7 +233,9 @@ class RunSingle:
             output_dir=config.output_dir,
             actions=config.actions,
         )
-        self.add_hook(SaveApplyPatchHook(apply_patch_locally=config.actions.apply_patch_locally))
+        self.add_hook(
+            SaveApplyPatchHook(apply_patch_locally=config.actions.apply_patch_locally)
+        )
         if config.actions.open_pr:
             self.logger.debug("Adding OpenPRHook")
             self.add_hook(OpenPRHook(config.actions.pr_config))
@@ -224,7 +250,9 @@ class RunSingle:
         self.logger.info("Starting environment")
         self.env.start()
         self.logger.info("Running agent")
-        self._chooks.on_instance_start(index=0, env=self.env, problem_statement=self.problem_statement)
+        self._chooks.on_instance_start(
+            index=0, env=self.env, problem_statement=self.problem_statement
+        )
         output_dir = self.output_dir / self.problem_statement.id
         output_dir.mkdir(parents=True, exist_ok=True)
         if self.agent.replay_config is not None:  # type: ignore[attr-defined]
@@ -250,7 +278,9 @@ def run_from_cli(args: list[str] | None = None):
         args = sys.argv[1:]
     assert __doc__ is not None
     help_text = (  # type: ignore
-        __doc__ + "\n[cyan][bold]=== ALL THE OPTIONS ===[/bold][/cyan]\n\n" + ConfigHelper().get_help(RunSingleConfig)
+        __doc__
+        + "\n[cyan][bold]=== ALL THE OPTIONS ===[/bold][/cyan]\n\n"
+        + ConfigHelper().get_help(RunSingleConfig)
     )
     run_from_config(BasicCLI(RunSingleConfig, help_text=help_text).get_config(args))  # type: ignore
 
